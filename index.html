@@ -6,17 +6,17 @@
 			var c,ctx;
 			var cwidth = 1000;
 			var cheight = 1000;
-			function init(){
 
+			function init(){
 				c = document.getElementById('main-screen');
 				ctx = c.getContext('2d');
-
 			}
 
 			var stage = function(){
 
 				this.actors = [];
 
+				this.name ='default-stage';
 
 				this.addActor = function(actorGet){
 					//this.actors.push(actorGet);
@@ -31,11 +31,11 @@
 						ctx.clearRect(0,0,cwidth,cheight);
 						
 						for(var x in thisHere.actors){
-							ctx.drawImage(thisHere.actors[x].sprite.resource,thisHere.actors[x].sprite.srcx,thisHere.actors[x].sprite.srcy,thisHere.actors[x].sprite.w,thisHere.actors[x].sprite.h,thisHere.actors[x].sprite.destx,thisHere.actors[x].sprite.desty,thisHere.actors[x].w,thisHere.actors[x].h);
+							ctx.drawImage(thisHere.actors[x].sprite.resource,thisHere.actors[x].sprite.srcx,thisHere.actors[x].sprite.srcy,thisHere.actors[x].sprite.w,thisHere.actors[x].sprite.h,thisHere.actors[x].x,thisHere.actors[x].y,thisHere.actors[x].w,thisHere.actors[x].h);
+							
 						}
-						
 						cback();
-					},2000);
+					},100);
 					
 				}
 
@@ -80,13 +80,19 @@
 				}
 			}
 
+
 			window.addEventListener('load',function(){
 				
 				//initialize important components
 				init();
 
-				//extends sprite
+
+
+
+				
+				var st = new stage();
 				var chimneySprite = new sprite();
+
 				chimneySprite.init({
 					resource: document.getElementById('chimney'),
 					srcx: 0,
@@ -94,30 +100,35 @@
 				});
 
 
+				
 				//extends actor
 				var chimneyActor = new actor();
 				chimneyActor.init({
 					sprite: chimneySprite,
-					x: 0,
-					y: 0,
+					x: 100,
+					y: 300,
 					h: 100,
 					w: 100,
 					name: 'chimney'
 				});
 
-				var st = new stage();
-				st.addActor(chimneyActor);
-
-
-
-				
-				st.render(function(){
-
+				var chimneySecondActor = new actor();
+				chimneySecondActor.init({
+					sprite: chimneySprite,
+					x: 500,
+					y: 300,
+					h: 100,
+					w: 100,
+					name: 'chimney-second'
 				});
-				
+
+				st.addActor(chimneyActor);
+				st.addActor(chimneySecondActor);
 
 
-
+				st.render(function(){
+					
+				});
 
 
 			});
@@ -126,8 +137,8 @@
 		</script>
 	</head>
 	<body>
-		<img id="chimney" src="images/chimney.jpg" height=100 width=100 style="display:none;" />
-		<canvas style="border:1px solid black;" id="main-screen" height=1000 width=1000>
+		<img id="chimney" src="images/chimney.png" height=100 width=100 style="display:none;" />
+		<canvas style="border:1px solid black;" id="main-screen" height=600 width=1300>
 		</canvas>
 	</body>
 </html>
