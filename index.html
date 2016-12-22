@@ -4,20 +4,45 @@
 		<script type="text/javascript">
 
 			var c,ctx;
-			var cwidth = 1000;
-			var cheight = 1000;
+			var cwidth = 1300;
+			var cheight = 600;
 
 			function init(){
 				c = document.getElementById('main-screen');
 				ctx = c.getContext('2d');
 			}
 
+			var World = {
+				sizex: 26000,
+				sizey: 100000
+			}
+
+			var Game = {
+				offsetMaxX: World.sizex - cwidth,
+				offsetMaxY: World.sizey - cheight,
+				offsetMinX: 0,
+				offsetMinY: 0
+			}
+
+
+			var camera = function(){
+				this.x = 0;
+				this.y = 0;
+
+			}
+
 			var stage = function(){
 
 				this.actors = [];
-
+				this.camera = '';
 				this.name ='default-stage';
+				this.translateX = 0;
+				this.translateY = 0;
 
+				this.setCamera = function(cameraGet){
+					this.camera = cameraGet;
+
+				}
 				this.addActor = function(actorGet){
 					//this.actors.push(actorGet);
 					this.actors[actorGet.name] = actorGet;
@@ -30,8 +55,48 @@
 						//clear all drawings to free memory
 						ctx.clearRect(0,0,cwidth,cheight);
 						
+
+
 						for(var x in thisHere.actors){
-							ctx.drawImage(thisHere.actors[x].sprite.resource,thisHere.actors[x].sprite.srcx,thisHere.actors[x].sprite.srcy,thisHere.actors[x].sprite.w,thisHere.actors[x].sprite.h,thisHere.actors[x].x,thisHere.actors[x].y,thisHere.actors[x].w,thisHere.actors[x].h);
+
+							//var translateX = thisHere.actors[x].x;
+							//var translateY = thisHere.actors[x].y;
+
+							
+							if(thisHere.camera!=''){
+								
+								if(x=='chimney'){
+
+									thisHere.camera.x = thisHere.actors[x].x - cwidth / 2;
+									thisHere.camera.y = thisHere.actors[x].y - cheight / 2;
+
+								}
+
+								if(thisHere.camera.x > Game.offsetMaxX)
+								    thisHere.camera.x = Game.offsetMaxX;
+								else if(thisHere.camera.x<Game.offsetMinX)
+								    thisHere.camera.x = Game.offsetMinX;
+
+									
+								if(thisHere.camera.y > Game.offsetMaxY)
+								    thisHere.camera.y = Game.offsetMaxY;
+								else if(thisHere.camera.y<Game.offsetMinY)
+								    thisHere.camera.y = Game.offsetMinY;
+									
+
+								thisHere.translateX = thisHere.actors[x].x-thisHere.camera.x;
+								thisHere.translateY = thisHere.actors[x].y-thisHere.camera.y; 
+
+							}else{
+								thisHere.translateX = thisHere.actors[x].x;
+								thisHere.translateY = thisHere.actors[x].y;
+							}
+
+							ctx.drawImage(thisHere.actors[x].sprite.resource,thisHere.actors[x].sprite.srcx,thisHere.actors[x].sprite.srcy,thisHere.actors[x].sprite.w,thisHere.actors[x].sprite.h,thisHere.translateX,thisHere.translateY,thisHere.actors[x].w,thisHere.actors[x].h);
+
+
+							
+							
 							
 						}
 						cback();
@@ -56,6 +121,9 @@
 					}
 				}
 
+				this.collide = function(actorGet){
+					
+				}
 
 
 
@@ -76,7 +144,6 @@
 						this[x] = config[x];
 					}
 
-
 				}
 			}
 
@@ -85,11 +152,9 @@
 				
 				//initialize important components
 				init();
-
-
-
-
 				
+
+				var cm = new camera();
 				var st = new stage();
 				var chimneySprite = new sprite();
 
@@ -99,14 +164,13 @@
 					srcy: 0
 				});
 
-
 				
 				//extends actor
 				var chimneyActor = new actor();
 				chimneyActor.init({
 					sprite: chimneySprite,
-					x: 100,
-					y: 300,
+					x: 0,
+					y: 0,
 					h: 100,
 					w: 100,
 					name: 'chimney'
@@ -126,7 +190,42 @@
 				st.addActor(chimneySecondActor);
 
 
+				st.setCamera(cm);
+
+
+
+
+				
+				c.tabIndex = 0;
+     			c.style.outline = 0;
+     			c.addEventListener('keydown',function(e){
+
+     				switch(e.keyCode) {
+					    case 68:
+					        st.actors['chimney'].x+=5;
+					        break;
+					    case 65:
+					    	st.actors['chimney'].x-=5;
+					    	break;
+					    case 83:
+					    	st.actors['chimney'].y+=5;
+					    	break;
+					    case 87:
+					    	st.actors['chimney'].y-=5;
+					    default:
+					        
+					}
+					if(e.keyCode==68){
+						st.actors['chimney'].x+=5;
+					}
+					console.log(e.keyCode);
+					
+				});
 				st.render(function(){
+					//st.actors['chimney'].x+=5;
+
+
+					
 					
 				});
 
